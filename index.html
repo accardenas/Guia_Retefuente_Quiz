@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Retención en la Fuente 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8; 
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .answer-option {
+            transition: background-color 0.3s, border-color 0.3s;
+            position: relative;
+            padding-right: 3rem; 
+        }
+        .answer-option:hover {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .correct-answer {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+        }
+        .feedback-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .icon-correct {
+            color: #16a34a; /* green-600 */
+        }
+        .icon-incorrect {
+            color: #dc2626; /* red-600 */
+        }
+        .rationale {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border-left-width: 4px;
+        }
+        .rationale-correct {
+            background-color: #f0fdf4;
+            color: #15803d;
+            border-color: #22c55e;
+        }
+        .rationale-incorrect {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-color: #ef4444;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- Header Section -->
+        <header class="card flex flex-col md:flex-row items-center justify-between mb-8">
+            <div class="flex items-center mb-4 md:mb-0">
+                <img src="Logo GESCONT transparencia.png" alt="Logo GESCONT" class="h-24 mr-6">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-[#1e3a8a]">Quiz Interactivo: Retención en la Fuente</h1>
+                    <p class="text-lg text-gray-600">Ponga a prueba sus conocimientos para <span class="font-semibold">Colfrutas SAS</span></p>
+                    <p class="text-xs text-slate-500 mt-2">Elaborado por: 👨🏽‍💻 CP. AUGUSTO CÁRDENAS | 📧 augustoccardenas@gmail.com | ☎️ 321 8168328</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="card">
+            <div id="question-header" class="mb-6">
+                <p class="text-sm text-gray-500">Pregunta <span id="question-number">1</span> de <span id="total-questions">10</span></p>
+                <h2 id="question-text" class="text-xl font-bold text-gray-900 mt-2">Cargando pregunta...</h2>
+            </div>
+            
+            <div id="answer-options" class="space-y-3">
+                <!-- Answer options will be dynamically inserted here -->
+            </div>
+
+            <div id="feedback-section" class="mt-6">
+                 <div id="rationale-container" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div id="navigation-section" class="flex justify-end mt-6">
+                <button id="next-button" class="bg-[#3b82f6] text-white font-bold py-2 px-6 rounded-lg hover:bg-[#1d4ed8] transition-colors hidden">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results-container" class="card text-center hidden">
+            <h2 class="text-3xl font-bold text-[#1e3a8a]">¡Cuestionario Completado!</h2>
+            <p class="text-lg mt-4">Tu puntaje final es:</p>
+            <p id="score-text" class="text-6xl font-bold my-4 text-blue-600">8 / 10</p>
+            <p id="summary-text" class="text-gray-600 mb-6"></p>
+            <button id="restart-button" class="bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-700 transition-colors">Intentar de Nuevo</button>
+        </div>
+    </div>
+
+<script>
+const quizData = {
+  "questions": [
+    {
+      "question": "A partir del 1 de junio de 2025, Colfrutas SAS contrata un servicio de mantenimiento por $180,000 a una persona natural no declarante. ¿Qué acción debe tomar el departamento de contabilidad?",
+      "hint": "El Decreto 572 de 2025 modificó las bases mínimas para la retención por servicios. Recuerde el nuevo umbral.",
+      "answerOptions": [
+        {
+          "text": "Pagar el valor total sin practicar retención, ya que el monto es muy bajo.",
+          "rationale": "Esta acción sería correcta si el valor del pago estuviera por debajo de la base mínima establecida por la nueva normativa.",
+          "isCorrect": false
+        },
+        {
+          "text": "Practicar una retención del 4% sobre el pago.",
+          "rationale": "La tarifa del 4% aplica para pagos por servicios, pero está reservada para proveedores que son personas jurídicas o personas naturales declarantes de renta.",
+          "isCorrect": false
+        },
+        {
+          "text": "Practicar una retención del 6% sobre el pago.",
+          "rationale": "El pago supera la nueva base mínima para servicios (2 UVT). La tarifa para personas naturales no declarantes es del 6%.",
+          "isCorrect": true
+        },
+        {
+          "text": "Pagar el valor total y solicitar al proveedor un certificado de no declarante.",
+          "rationale": "Si bien el certificado es un soporte útil, la obligación de retener se activa al superar la base mínima, independientemente de otros documentos.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Colfrutas SAS, al no estar registrada como Sociedad de Comercialización Internacional (C.I.), realiza una compra de plátano a un productor de Urabá por $4,000,000. ¿Cuál es el tratamiento correcto de retención en la fuente?",
+      "hint": "La exención de retención en compras para exportación es un beneficio exclusivo para un tipo específico de empresa.",
+      "answerOptions": [
+        {
+          "text": "No se practica retención porque el destino de la compra es la exportación.",
+          "rationale": "Este beneficio solo aplica si la empresa compradora está registrada y autorizada como una Sociedad de Comercialización Internacional (C.I.).",
+          "isCorrect": false
+        },
+        {
+          "text": "Se practica una retención del 1.5% porque el valor de la compra supera la base de 70 UVT.",
+          "rationale": "Dado que Colfrutas SAS no es una C.I., debe actuar como un agente retenedor normal. El pago supera la base y la tarifa para compras agrícolas es del 1.5%.",
+          "isCorrect": true
+        },
+        {
+          "text": "Se practica una retención del 2.5% correspondiente a compras generales.",
+          "rationale": "La tarifa del 2.5% es para compras generales a declarantes de renta, no para la compra de productos agrícolas sin transformación industrial.",
+          "isCorrect": false
+        },
+        {
+          "text": "No se practica retención, pero se debe generar el Documento Soporte.",
+          "rationale": "La generación del Documento Soporte es obligatoria para soportar el costo, pero la obligación de retener se activa al superar la base y no ser una C.I.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Un consultor contable (persona natural) presta servicios de honorarios a Colfrutas SAS y desea que su retención se calcule bajo la tabla del Art. 383 E.T. ¿Cuál es el documento INDISPENSABLE que debe entregar a la empresa?",
+      "hint": "Para optar por este beneficio, el proveedor debe hacer una renuncia explícita a un derecho en su futura declaración de renta.",
+      "answerOptions": [
+        {
+          "text": "El RUT actualizado.",
+          "rationale": "El RUT es un documento fundamental para identificar al proveedor, pero por sí solo no autoriza el tratamiento especial del Art. 383 E.T.",
+          "isCorrect": false
+        },
+        {
+          "text": "La factura electrónica de venta.",
+          "rationale": "La factura soporta la operación económica, pero no contiene la declaración necesaria para optar por el tratamiento fiscal de rentas de trabajo.",
+          "isCorrect": false
+        },
+        {
+          "text": "Un certificado de su contador donde consten sus ingresos.",
+          "rationale": "Un certificado de ingresos no reemplaza la manifestación legal requerida por la norma para este tratamiento específico.",
+          "isCorrect": false
+        },
+        {
+          "text": "Una manifestación escrita y bajo juramento de que no solicitará costos y deducciones.",
+          "rationale": "Esta es la condición no negociable exigida por la normativa para que una persona natural pueda someter sus honorarios a la retención de rentas de trabajo.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "question": "Un empleado de Colfrutas SAS tiene un salario de $8,000,000 y solicita la deducción por intereses de vivienda. Para que sea procedente, debe entregar el certificado del banco. ¿Cuál es el límite máximo mensual que se puede deducir por este concepto?",
+      "hint": "El Estatuto Tributario establece un límite mensual para la deducción por intereses de vivienda, expresado en UVT.",
+      "answerOptions": [
+        {
+          "text": "16 UVT.",
+          "rationale": "El límite de 16 UVT corresponde a la deducción mensual por pagos de medicina prepagada o seguros de salud.",
+          "isCorrect": false
+        },
+        {
+          "text": "32 UVT.",
+          "rationale": "El límite de 32 UVT está asociado a la deducción mensual por dependientes económicos.",
+          "isCorrect": false
+        },
+        {
+          "text": "100 UVT.",
+          "rationale": "El artículo 387 del E.T. establece un tope mensual de 100 UVT para la deducción por intereses de préstamos de vivienda.",
+          "isCorrect": true
+        },
+        {
+          "text": "No hay límite, se puede deducir el valor total certificado por el banco.",
+          "rationale": "Todas las deducciones en la depuración de la base de retención por salarios están sujetas a límites específicos establecidos en la ley.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Colfrutas SAS realiza un pago por honorarios de $5,000,000 a una firma de abogados (persona jurídica). ¿Qué tarifa de retención en la fuente debe aplicar?",
+      "hint": "La tarifa de retención por honorarios para personas jurídicas es una tarifa fija y diferente a la de personas naturales.",
+      "answerOptions": [
+        {
+          "text": "10%",
+          "rationale": "La tarifa del 10% se aplica generalmente a honorarios pagados a personas naturales que no superan ciertos topes anuales.",
+          "isCorrect": false
+        },
+        {
+          "text": "11%",
+          "rationale": "El artículo 392 del E.T. y sus decretos reglamentarios establecen una tarifa fija del 11% para honorarios pagados a personas jurídicas.",
+          "isCorrect": true
+        },
+        {
+          "text": "4%",
+          "rationale": "La tarifa del 4% está asociada a la retención por servicios, no por honorarios.",
+          "isCorrect": false
+        },
+        {
+          "text": "Se debe aplicar la tabla del Art. 383 E.T.",
+          "rationale": "El tratamiento del Art. 383 E.T. es un beneficio opcional exclusivo para personas naturales, no para personas jurídicas.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Al realizar una compra de plátano a un productor no obligado a facturar, ¿cuándo es obligatorio para Colfrutas SAS generar el Documento Soporte en Adquisiciones?",
+      "hint": "La obligación de generar este documento está ligada a la necesidad de soportar fiscalmente la transacción, no necesariamente a la retención.",
+      "answerOptions": [
+        {
+          "text": "Únicamente cuando la compra supera la base de retención de 70 UVT.",
+          "rationale": "La obligación de retener se activa al superar la base, pero el soporte del costo o gasto es necesario para todas las operaciones.",
+          "isCorrect": false
+        },
+        {
+          "text": "Siempre, independientemente del valor de la compra.",
+          "rationale": "Para que el costo de la compra sea deducible en la declaración de renta, cada operación con un no obligado a facturar debe estar respaldada por su respectivo Documento Soporte.",
+          "isCorrect": true
+        },
+        {
+          "text": "Solo si el productor lo solicita para sus propios registros contables.",
+          "rationale": "La obligación de generar el Documento Soporte es del comprador (Colfrutas SAS) para sus propios fines fiscales, no depende de una solicitud del vendedor.",
+          "isCorrect": false
+        },
+        {
+          "text": "Nunca, porque la empresa exporta el producto.",
+          "rationale": "La obligación de soportar las compras a proveedores nacionales es independiente del destino final del producto.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Un proveedor de servicios (persona natural) presenta un RUT donde la casilla 53 NO tiene marcada la responsabilidad \"05 - Impuesto sobre la Renta\". Si el pago por el servicio es de $250,000, ¿qué tarifa de retención se debe usar?",
+      "hint": "La ausencia de la responsabilidad 05 en el RUT indica el estatus fiscal del proveedor, lo cual determina la tarifa aplicable para servicios.",
+      "answerOptions": [
+        {
+          "text": "4%",
+          "rationale": "La tarifa del 4% se reserva para proveedores de servicios que sí son declarantes de renta o son personas jurídicas.",
+          "isCorrect": false
+        },
+        {
+          "text": "10%",
+          "rationale": "La tarifa del 10% corresponde a honorarios, no a servicios.",
+          "isCorrect": false
+        },
+        {
+          "text": "6%",
+          "rationale": "Un proveedor persona natural sin la responsabilidad 05 es considerado no declarante, y para servicios, la tarifa aplicable es del 6%.",
+          "isCorrect": true
+        },
+        {
+          "text": "0%, porque el RUT no está completo.",
+          "rationale": "La información del RUT es suficiente para tomar una decisión. La ausencia de la responsabilidad 05 obliga a aplicar la tarifa para no declarantes.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "En julio de 2025, Colfrutas SAS realiza una compra de plátano a un productor por un valor de $3,000,000. ¿Debe practicar retención en la fuente?",
+      "hint": "Compare el valor de la operación con la base mínima aplicable para compras agrícolas a partir del 1 de junio de 2025.",
+      "answerOptions": [
+        {
+          "text": "Sí, porque todas las compras agrícolas están sujetas a retención.",
+          "rationale": "La retención solo se practica si el valor de la operación supera la base mínima establecida por la ley.",
+          "isCorrect": false
+        },
+        {
+          "text": "No, porque el valor de la compra es inferior a la base de 70 UVT.",
+          "rationale": "La base mínima para retención en compras agrícolas es de 70 UVT ($3,485,930). Como el pago es inferior a este monto, no se practica retención.",
+          "isCorrect": true
+        },
+        {
+          "text": "Sí, porque el valor supera la base de 10 UVT para compras generales.",
+          "rationale": "Las compras agrícolas tienen una base y una tarifa específicas, diferentes a las de las compras generales.",
+          "isCorrect": false
+        },
+        {
+          "text": "No, porque el proveedor es un pequeño productor.",
+          "rationale": "El estatus de 'pequeño productor' no exime de la aplicación de la retención en la fuente si se cumplen las condiciones de base y cuantía.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "En el contexto de la retención en la fuente, ¿por qué es fundamental para Colfrutas SAS solicitar y archivar el RUT actualizado de todos sus proveedores?",
+      "hint": "El RUT es el 'documento de identidad' tributario de un proveedor y contiene la información necesaria para aplicar las tarifas correctas.",
+      "answerOptions": [
+        {
+          "text": "Para verificar la dirección y el teléfono del proveedor.",
+          "rationale": "Aunque el RUT contiene esta información, su propósito principal desde la perspectiva de la retención es validar las responsabilidades fiscales.",
+          "isCorrect": false
+        },
+        {
+          "text": "Para determinar la tarifa correcta de retención según las responsabilidades fiscales del proveedor.",
+          "rationale": "El RUT permite verificar si una persona natural es declarante de renta (para servicios) o si una entidad pertenece a un régimen especial, lo cual es clave para definir la tarifa.",
+          "isCorrect": true
+        },
+        {
+          "text": "Es un requisito únicamente para pagos al exterior.",
+          "rationale": "El RUT es un documento fundamental para todas las operaciones con proveedores nacionales, no solo para pagos al exterior.",
+          "isCorrect": false
+        },
+        {
+          "text": "Para confirmar que el proveedor está al día con sus pagos a la DIAN.",
+          "rationale": "El RUT certifica las responsabilidades fiscales de un contribuyente, pero no su estado de cuenta o si está al día con sus obligaciones.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Un empleado solicita la deducción por dependientes económicos. ¿Cuál de los siguientes documentos NO sería un soporte válido por sí solo para justificar la deducción?",
+      "hint": "La ley exige pruebas documentales específicas que demuestren el parentesco o la dependencia económica.",
+      "answerOptions": [
+        {
+          "text": "Registro civil de nacimiento de un hijo menor de 18 años.",
+          "rationale": "Este documento prueba directamente el parentesco y la edad, siendo un soporte válido para la deducción por hijos.",
+          "isCorrect": false
+        },
+        {
+          "text": "Una declaración juramentada del empleado afirmando que sostiene a sus padres.",
+          "rationale": "Una simple declaración del empleado no es suficiente; se requiere una certificación de un contador público que acredite la dependencia económica.",
+          "isCorrect": true
+        },
+        {
+          "text": "Certificado de estudios de un hijo entre 18 y 23 años.",
+          "rationale": "Para hijos en este rango de edad, el certificado de estudios es un requisito esencial para demostrar que están cursando estudios y pueden ser tomados como dependientes.",
+          "isCorrect": false
+        },
+        {
+          "text": "Certificado médico que acredita una discapacidad física o psicológica.",
+          "rationale": "En casos de dependencia por discapacidad, el certificado emitido por un profesional de la salud es el soporte idóneo y requerido.",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+};
+
+let currentQuestionIndex = 0;
+let score = 0;
+let answerSelected = false;
+
+const questionNumberEl = document.getElementById('question-number');
+const totalQuestionsEl = document.getElementById('total-questions');
+const questionTextEl = document.getElementById('question-text');
+const answerOptionsEl = document.getElementById('answer-options');
+const rationaleContainerEl = document.getElementById('rationale-container');
+const nextButton = document.getElementById('next-button');
+const quizContainer = document.getElementById('quiz-container');
+const resultsContainer = document.getElementById('results-container');
+const scoreTextEl = document.getElementById('score-text');
+const summaryTextEl = document.getElementById('summary-text');
+const restartButton = document.getElementById('restart-button');
+
+function displayQuestion() {
+    answerSelected = false;
+    rationaleContainerEl.innerHTML = '';
+    const question = quizData.questions[currentQuestionIndex];
+    questionNumberEl.textContent = currentQuestionIndex + 1;
+    totalQuestionsEl.textContent = quizData.questions.length;
+    questionTextEl.textContent = question.question;
+    answerOptionsEl.innerHTML = '';
+    
+    question.answerOptions.forEach((option, index) => {
+        const optionButton = document.createElement('button');
+        optionButton.className = 'answer-option w-full text-left p-4 border-2 border-gray-300 rounded-lg';
+        optionButton.textContent = option.text;
+        optionButton.dataset.index = index;
+        optionButton.onclick = () => selectAnswer(optionButton, option, question.answerOptions);
+        answerOptionsEl.appendChild(optionButton);
+    });
+
+    nextButton.classList.add('hidden');
+}
+
+function selectAnswer(selectedButton, selectedOption, allOptions) {
+    if (answerSelected) return;
+    answerSelected = true;
+    
+    const correctOptionIndex = allOptions.findIndex(opt => opt.isCorrect);
+    const correctButton = answerOptionsEl.querySelector(`[data-index='${correctOptionIndex}']`);
+    
+    const correctIcon = document.createElement('span');
+    correctIcon.className = 'feedback-icon icon-correct';
+    correctIcon.innerHTML = '&#10003;'; // Checkmark
+    correctButton.appendChild(correctIcon);
+    correctButton.classList.add('correct-answer');
+
+    if (selectedOption.isCorrect) {
+        score++;
+    } else {
+        selectedButton.classList.add('incorrect-answer');
+        const incorrectIcon = document.createElement('span');
+        incorrectIcon.className = 'feedback-icon icon-incorrect';
+        incorrectIcon.innerHTML = '&#10007;'; // 'X' mark
+        selectedButton.appendChild(incorrectIcon);
+    }
+
+    allOptions.forEach((option, index) => {
+        const button = answerOptionsEl.querySelector(`[data-index='${index}']`);
+        button.disabled = true;
+        
+        const rationaleDiv = document.createElement('div');
+        rationaleDiv.textContent = option.rationale;
+        
+        if (option.isCorrect) {
+            rationaleDiv.className = 'rationale rationale-correct';
+        } else {
+            rationaleDiv.className = 'rationale rationale-incorrect';
+        }
+        
+        rationaleContainerEl.appendChild(rationaleDiv);
+    });
+
+    nextButton.classList.remove('hidden');
+}
+
+function showResults() {
+    quizContainer.classList.add('hidden');
+    resultsContainer.classList.remove('hidden');
+    scoreTextEl.textContent = `${score} / ${quizData.questions.length}`;
+
+    let summary = '';
+    if(score === quizData.questions.length) {
+        summary = '¡Felicitaciones! Tienes un conocimiento experto del tema.';
+    } else if (score >= quizData.questions.length * 0.7) {
+        summary = '¡Muy buen trabajo! Tienes un sólido conocimiento de la mayoría de los conceptos.';
+    } else {
+        summary = '¡Sigue practicando! Revisa las rationales para reforzar los temas más complejos.';
+    }
+    summaryTextEl.textContent = summary;
+}
+
+nextButton.addEventListener('click', () => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.questions.length) {
+        displayQuestion();
+    } else {
+        showResults();
+    }
+});
+
+restartButton.addEventListener('click', () => {
+    currentQuestionIndex = 0;
+    score = 0;
+    resultsContainer.classList.add('hidden');
+    quizContainer.classList.remove('hidden');
+    displayQuestion();
+});
+
+// Initial load
+displayQuestion();
+
+</script>
+
+</body>
+</html>
